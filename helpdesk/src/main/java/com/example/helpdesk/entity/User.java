@@ -1,5 +1,6 @@
 package com.example.helpdesk.entity;
 
+import com.example.helpdesk.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -70,6 +71,3 @@ public class User {
 
 }
 
-enum UserStatus {
-    ACTIVE, INACTIVE, SUSPENDED
-}

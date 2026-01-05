@@ -1,5 +1,8 @@
 package com.example.helpdesk.entity;
 
+import com.example.helpdesk.enums.TicketCategory;
+import com.example.helpdesk.enums.TicketPriority;
+import com.example.helpdesk.enums.TicketStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -79,16 +82,4 @@ public class Ticket {
     }
 }
 
-
-enum TicketPriority {
-    LOW, MEDIUM, HIGH, CRITICAL
-}
-
-enum TicketStatus {
-    OPEN, IN_PROGRESS, RESOLVED, CLOSED, REOPENED
-}
-
-enum TicketCategory {
-    HARDWARE, SOFTWARE, NETWORK, EMAIL, ACCOUNT, OTHER
-}
 
