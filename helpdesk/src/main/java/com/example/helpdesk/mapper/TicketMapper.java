@@ -3,63 +3,54 @@ package com.example.helpdesk.mapper;
 import com.example.helpdesk.dto.TicketCreateDto;
 import com.example.helpdesk.dto.TicketDto;
 import com.example.helpdesk.dto.TicketUpdateDto;
-import com.example.helpdesk.entity.Department;
 import com.example.helpdesk.entity.Ticket;
-import com.example.helpdesk.entity.TicketAttachment;
-import com.example.helpdesk.entity.TicketComment;
+import com.example.helpdesk.entity.User;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring",
-        uses = {UserMapper.class, DepartmentMapper.class},
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR
-)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface TicketMapper {
 
-    TicketMapper INSTANCE = Mappers.getMapper(TicketMapper.class);
-
-    @Mapping(source = "createdBy.id", target = "createdById")
-    @Mapping(source = "createdBy.username", target = "createdByUsername")
-    @Mapping(source = "assignedTo.id", target = "assignedToId")
-    @Mapping(source = "assignedTo.username", target = "assignedToUsername")
-    @Mapping(source = "department", target = "departmentId", qualifiedByName = "departmentToId")
-    @Mapping(source = "department", target = "departmentName", qualifiedByName = "departmentToName")
-    @Mapping(source = "comments", target = "commentCount", qualifiedByName = "countComments")
-    @Mapping(source = "attachments", target = "attachmentCount", qualifiedByName = "countAttachments")
+    @Mapping(target = "createdByUsername", source = "createdBy.username")
+    @Mapping(target = "createdByFullName", expression = "java(getFullName(ticket.getCreatedBy()))")
+    @Mapping(target = "assignedToUsername", source = "assignedTo.username")
+    @Mapping(target = "assignedToFullName", expression = "java(getFullName(ticket.getAssignedTo()))")
+    @Mapping(target = "departmentName", source = "department.name")
     TicketDto toDto(Ticket ticket);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "resolvedAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "assignedTo", ignore = true)
     @Mapping(target = "department", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "closedAt", ignore = true)
-    @Mapping(target = "status", constant = "OPEN")
     @Mapping(target = "comments", ignore = true)
     @Mapping(target = "attachments", ignore = true)
     Ticket toEntity(TicketCreateDto dto);
 
-    @Named("departmentToId")
-    default Long departmentToId(Department department) {
-        return department != null ? department.getId() : null;
-    }
+    List<TicketDto> toDtoList(List<Ticket> tickets);
 
-    @Named("departmentToName")
-    default String departmentToName(Department department) {
-        return department != null ? department.getName() : null;
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "resolvedAt", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "assignedTo", ignore = true)
+    @Mapping(target = "department", ignore = true)
+    @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "attachments", ignore = true)
+    void updateEntity(TicketUpdateDto dto, @MappingTarget Ticket ticket);
 
-    @Named("countComments")
-    default long countComments(List<TicketComment> comments) {
-        return comments != null ? comments.size() : 0;
+    default String getFullName(User user) {
+        if (user == null) {
+            return null;
+        }
+        if (user.getFirstName() != null && user.getLastName() != null) {
+            return user.getFirstName() + " " + user.getLastName();
+        }
+        return user.getUsername();
     }
-
-    @Named("countAttachments")
-    default long countAttachments(List<TicketAttachment> attachments) {
-        return attachments != null ? attachments.size() : 0;
-    }
-
 }

@@ -4,46 +4,27 @@ import com.example.helpdesk.enums.TicketCategory;
 import com.example.helpdesk.enums.TicketPriority;
 import com.example.helpdesk.enums.TicketStatus;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class TicketDto {
-
     private Long id;
-
     private String title;
-
     private String description;
-
-    private TicketPriority priority;
-
     private TicketStatus status;
-
+    private TicketPriority priority;
     private TicketCategory category;
-
-    private Long createdById;
-
-    private String createdByUsername;
-
-    private Long assignedToId;
-
-    private String assignedToUsername;
-
-    private Long departmentId;
-
-    private String departmentName;
-
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
-
-    private LocalDateTime closedAt;
-
-    private long commentCount;
-    private long attachmentCount;
-
-
+    private LocalDateTime resolvedAt;
+    private String createdByUsername;
+    private String createdByFullName;
+    private String assignedToUsername;
+    private String assignedToFullName;
+    private String departmentName;
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Denied - IT Helpdesk</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .error-card {
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card error-card">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-ban fa-5x text-danger mb-4"></i>
+                        <h1 class="display-4 text-danger">Access Denied</h1>
+                        <p class="lead text-muted mb-4">
+                            You do not have permission to access this resource.
+                        </p>
+                        <p class="text-muted">
+                            If you believe this is an error, please contact your system administrator.
+                        </p>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                            <a th:href="@{/dashboard}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-home"></i> Go to Dashboard
+                            </a>
+                            <a th:href="@{/auth/logout}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

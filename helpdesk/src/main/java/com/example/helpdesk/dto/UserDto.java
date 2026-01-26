@@ -1,11 +1,13 @@
 package com.example.helpdesk.dto;
 
-import com.example.helpdesk.enums.UserStatus;
+import com.example.helpdesk.validation.UniqueEmail;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-import java.time.LocalDateTime;
-import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -13,29 +15,22 @@ public class UserDto {
 
     private Long id;
 
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
     private String username;
 
+    @Size(min = 6, message = "Password must be at least 6 characters")
+    private String password;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
+    @UniqueEmail
     private String email;
 
     private String firstName;
-
     private String lastName;
-
     private String phoneNumber;
-
-    private UserStatus status;
-
+    private String status;
     private Long departmentId;
-
     private String departmentName;
-
-    private Set<String> roles;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime lastLogin;
-
-    private int openTicketsCount;
-    private int assignedTicketsCount;
-
 }

@@ -2,6 +2,7 @@ package com.example.helpdesk.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,8 +18,10 @@ public class TicketComment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
+
+    private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "ticket_id", nullable = false)
@@ -28,12 +31,8 @@ public class TicketComment {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private LocalDateTime createdAt;
-    private boolean internalNote;
-
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
-
 }

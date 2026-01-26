@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+    <nav th:fragment="sidebar" class="col-md-2 d-md-block bg-light sidebar">
+        <div class="position-sticky pt-3">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/dashboard}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/tickets}">
+                        <i class="fas fa-ticket-alt"></i> All Tickets
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/tickets/create}">
+                        <i class="fas fa-plus-circle"></i> New Ticket
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/tickets/search}">
+                        <i class="fas fa-search"></i> Search Tickets
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</body>
+</html>

@@ -1,17 +1,16 @@
 package com.example.helpdesk.validation;
 
-import com.example.helpdesk.enums.TicketStatus;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = ValidTicketStatusValidator.class)
+@Constraint(validatedBy = UniqueEmailValidator.class)
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidTicketStatus {
-    String message() default "Invalid ticket status transition";
+public @interface UniqueEmail {
+    String message() default "Email already exists";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

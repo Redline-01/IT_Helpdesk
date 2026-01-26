@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - IT Helpdesk</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .login-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card login-card">
+                    <div class="login-header">
+                        <i class="fas fa-headset fa-3x mb-3"></i>
+                        <h3 class="mb-0">IT Helpdesk</h3>
+                        <p class="mb-0">Sign in to your account</p>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- Success Message -->
+                        <div th:if="${param.logout}" class="alert alert-success" role="alert">
+                            <i class="fas fa-check-circle"></i> You have been logged out successfully.
+                        </div>
+
+                        <!-- Error Message -->
+                        <div th:if="${param.error}" class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-circle"></i> Invalid username or password.
+                        </div>
+
+                        <!-- Flash Messages -->
+                        <div th:if="${success}" class="alert alert-success" role="alert">
+                            <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+                        </div>
+
+                        <form th:action="@{/auth/login}" method="post">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">
+                                    <i class="fas fa-user"></i> Username
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="username"
+                                       name="username" placeholder="Enter username" required autofocus>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">
+                                    <i class="fas fa-lock"></i> Password
+                                </label>
+                                <input type="password" class="form-control form-control-lg" id="password"
+                                       name="password" placeholder="Enter password" required>
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
+                                <label class="form-check-label" for="remember-me">Remember me</label>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-sign-in-alt"></i> Login
+                                </button>
+                            </div>
+                        </form>
+
+                        <hr class="my-4">
+
+                        <div class="text-center">
+                            <p class="mb-0">Don't have an account?
+                                <a th:href="@{/auth/register}" class="text-decoration-none fw-bold">Register here</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

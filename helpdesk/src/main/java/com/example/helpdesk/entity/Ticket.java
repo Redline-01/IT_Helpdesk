@@ -4,9 +4,8 @@ import com.example.helpdesk.enums.TicketCategory;
 import com.example.helpdesk.enums.TicketPriority;
 import com.example.helpdesk.enums.TicketStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,26 +23,29 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Title is required")
-    @Size(min = 5, max = 100, message = "Title must be between 5 and 100 characters")
+    @Column(nullable = false)
     private String title;
 
-    @NotBlank(message = "Description is required")
-    @Size(min = 10, max = 5000, message = "Description must be between 10 and 5000 characters")
     @Column(columnDefinition = "TEXT")
     private String description;
 
     @Enumerated(EnumType.STRING)
-    private TicketPriority priority;
+    @Builder.Default
+    private TicketStatus status = TicketStatus.OPEN;
 
     @Enumerated(EnumType.STRING)
-    private TicketStatus status;
+    @Builder.Default
+    private TicketPriority priority = TicketPriority.MEDIUM;
 
     @Enumerated(EnumType.STRING)
     private TicketCategory category;
 
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime resolvedAt;
+
     @ManyToOne
-    @JoinColumn(name = "created_by_id")
+    @JoinColumn(name = "created_by_id", nullable = false)
     private User createdBy;
 
     @ManyToOne
@@ -54,32 +56,33 @@ public class Ticket {
     @JoinColumn(name = "department_id")
     private Department department;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private LocalDateTime closedAt;
-
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<TicketComment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<TicketAttachment> attachments = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        status = TicketStatus.OPEN;
+        if (status == null) {
+            status = TicketStatus.OPEN;
+        }
+        if (priority == null) {
+            priority = TicketPriority.MEDIUM;
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-        if (status == TicketStatus.CLOSED && closedAt == null) {
-            closedAt = LocalDateTime.now();
+        if (status == TicketStatus.RESOLVED || status == TicketStatus.CLOSED) {
+            if (resolvedAt == null) {
+                resolvedAt = LocalDateTime.now();
+            }
         }
-
-
     }
 }
-
-

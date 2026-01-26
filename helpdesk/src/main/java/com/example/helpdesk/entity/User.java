@@ -4,11 +4,11 @@ import com.example.helpdesk.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -37,7 +37,8 @@ public class User {
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
-    private UserStatus status;
+    @Builder.Default
+    private UserStatus status = UserStatus.ACTIVE;
 
     private LocalDateTime createdAt;
     private LocalDateTime lastLogin;
@@ -52,22 +53,29 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "createdBy")
+    @Builder.Default
     private List<Ticket> createdTickets = new ArrayList<>();
 
     @OneToMany(mappedBy = "assignedTo")
+    @Builder.Default
     private List<Ticket> assignedTickets = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        status = UserStatus.ACTIVE;
+        if (status == null) {
+            status = UserStatus.ACTIVE;
+        }
     }
 
-
-
-
+    public String getFullName() {
+        if (firstName != null && lastName != null) {
+            return firstName + " " + lastName;
+        }
+        return username;
+    }
 }
-

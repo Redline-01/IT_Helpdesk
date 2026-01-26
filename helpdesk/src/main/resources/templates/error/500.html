@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - IT Helpdesk</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-lg">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-exclamation-triangle fa-5x text-warning mb-4"></i>
+                        <h1 class="display-4 text-danger">Internal Server Error</h1>
+                        <p class="lead text-muted mb-4">
+                            Something went wrong on our end.
+                        </p>
+                        <p class="text-muted" th:if="${error}">
+                            <strong>Details:</strong> <span th:text="${error}"></span>
+                        </p>
+                        <div class="d-grid gap-2 mt-4">
+                            <a th:href="@{/}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-home"></i> Go to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

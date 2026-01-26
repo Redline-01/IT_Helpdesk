@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} ?: 'IT Helpdesk'">IT Helpdesk</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+    <!-- Navbar -->
+    <div th:replace="~{shared/navbar :: navbar}"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div th:if="${#authorization.expression('isAuthenticated()')}" th:replace="~{shared/sidebar :: sidebar}" class="col-md-2"></div>
+
+            <!-- Main Content -->
+            <main class="col-md-10 ms-sm-auto px-md-4" th:classappend="${#authorization.expression('!isAuthenticated()')} ? 'col-12' : ''">
+                <!-- Alert Messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                    <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Page Content -->
+                <div th:replace="${content}">
+                    <!-- Page content goes here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{shared/footer :: footer}"></div>
+
+    <!-- Bootstrap JS -->
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+    <!-- Chart.js -->
+    <script th:src="@{/webjars/chart.js/4.4.3/dist/chart.umd.js}"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/charts.js}"></script>
+</body>
+</html>

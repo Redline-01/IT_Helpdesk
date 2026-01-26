@@ -5,10 +5,12 @@ import com.example.helpdesk.enums.TicketPriority;
 import com.example.helpdesk.enums.TicketStatus;
 import com.example.helpdesk.validation.ValidTicketStatus;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -19,16 +21,19 @@ public class TicketUpdateDto {
     private String title;
 
     @NotBlank(message = "Description is required")
-    @Size(min = 10, max = 5000, message = "Description must be between 10 and 5000 characters")
+    @Size(min = 10, message = "Description must be at least 10 characters")
     private String description;
 
-    private TicketPriority priority;
-
+    @NotNull(message = "Status is required")
     @ValidTicketStatus
     private TicketStatus status;
 
+    @NotNull(message = "Priority is required")
+    private TicketPriority priority;
+
+    @NotNull(message = "Category is required")
     private TicketCategory category;
+
     private Long assignedToId;
     private Long departmentId;
-
 }

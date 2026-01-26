@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Tickets - IT Helpdesk</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{shared/navbar :: navbar}"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{shared/sidebar :: sidebar}"></div>
+
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2"><i class="fas fa-search"></i> Search & Filter Tickets</h1>
+                    <a th:href="@{/tickets}" class="btn btn-secondary">
+                        <i class="fas fa-list"></i> All Tickets
+                    </a>
+                </div>
+
+                <!-- Search Form -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-filter"></i> Search Filters</h5>
+                    </div>
+                    <div class="card-body" style="color: #212529;">
+                        <form th:action="@{/tickets/search}" method="get">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="status" class="form-label" style="color: #212529;">
+                                        <i class="fas fa-info-circle"></i> Status
+                                    </label>
+                                    <select class="form-select" id="status" name="status">
+                                        <option value="">All Statuses</option>
+                                        <option th:each="status : ${statuses}"
+                                                th:value="${status}"
+                                                th:text="${status.displayName}"
+                                                th:selected="${status == selectedStatus}">Status</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label for="priority" class="form-label" style="color: #212529;">
+                                        <i class="fas fa-exclamation-triangle"></i> Priority
+                                    </label>
+                                    <select class="form-select" id="priority" name="priority">
+                                        <option value="">All Priorities</option>
+                                        <option th:each="priority : ${priorities}"
+                                                th:value="${priority}"
+                                                th:text="${priority.displayName}"
+                                                th:selected="${priority == selectedPriority}">Priority</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label for="keyword" class="form-label" style="color: #212529;">
+                                        <i class="fas fa-keyboard"></i> Keyword
+                                    </label>
+                                    <input type="text" class="form-control" id="keyword" name="keyword"
+                                           th:value="${keyword}" placeholder="Search in title/description">
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                                <a th:href="@{/tickets/search}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-redo"></i> Reset
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Search Results -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white" style="color: #212529;">
+                        <h5 class="mb-0" style="color: #212529;">
+                            <i class="fas fa-list-alt"></i> Search Results
+                            <span class="badge bg-primary" th:text="${#lists.size(tickets)}">0</span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${#lists.isEmpty(tickets)}">
+                                        <td colspan="7" class="text-center py-4">
+                                            <i class="fas fa-search fa-3x text-muted mb-3 d-block"></i>
+                                            <p class="text-muted">No tickets found matching your criteria</p>
+                                        </td>
+                                    </tr>
+                                    <tr th:each="ticket : ${tickets}">
+                                        <td class="fw-bold">#<span th:text="${ticket.id}">1</span></td>
+                                        <td>
+                                            <a th:href="@{/tickets/{id}(id=${ticket.id})}"
+                                               class="text-decoration-none" th:text="${ticket.title}">
+                                                Ticket Title
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted" th:text="${ticket.category.displayName}">Category</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge"
+                                                  th:classappend="'bg-' + ${ticket.priority.badgeClass}"
+                                                  th:text="${ticket.priority.displayName}">
+                                                Priority
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge"
+                                                  th:classappend="'bg-' + ${ticket.status.badgeClass}"
+                                                  th:text="${ticket.status.displayName}">
+                                                Status
+                                            </span>
+                                        </td>
+                                        <td th:text="${#temporals.format(ticket.createdAt, 'yyyy-MM-dd')}">2025-01-01</td>
+                                        <td>
+                                            <a th:href="@{/tickets/{id}(id=${ticket.id})}"
+                                               class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div th:replace="~{shared/footer :: footer}"></div>
+
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>
