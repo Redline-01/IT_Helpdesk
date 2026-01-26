@@ -32,7 +32,7 @@ public class TicketService {
     @Transactional(readOnly = true)
     public List<TicketDto> getAllTickets() {
         try {
-            return ticketMapper.toDtoList(ticketRepository.findAll());
+            return ticketMapper.toDtoList(ticketRepository.findAllByOrderByCreatedAtDesc());
         } catch (Exception e) {
             log.error("Error mapping tickets: {}", e.getMessage(), e);
             return Collections.emptyList();
@@ -99,22 +99,22 @@ public class TicketService {
 
     @Transactional(readOnly = true)
     public List<TicketDto> getTicketsByStatus(TicketStatus status) {
-        return ticketMapper.toDtoList(ticketRepository.findByStatus(status));
+        return ticketMapper.toDtoList(ticketRepository.findByStatusOrderByCreatedAtDesc(status));
     }
 
     @Transactional(readOnly = true)
     public List<TicketDto> getTicketsByPriority(TicketPriority priority) {
-        return ticketMapper.toDtoList(ticketRepository.findByPriority(priority));
+        return ticketMapper.toDtoList(ticketRepository.findByPriorityOrderByCreatedAtDesc(priority));
     }
 
     @Transactional(readOnly = true)
     public List<TicketDto> getTicketsByUser(Long userId) {
-        return ticketMapper.toDtoList(ticketRepository.findByCreatedBy_Id(userId));
+        return ticketMapper.toDtoList(ticketRepository.findByCreatedBy_IdOrderByCreatedAtDesc(userId));
     }
 
     @Transactional(readOnly = true)
     public List<TicketDto> getAssignedTickets(Long userId) {
-        return ticketMapper.toDtoList(ticketRepository.findByAssignedTo_Id(userId));
+        return ticketMapper.toDtoList(ticketRepository.findByAssignedTo_IdOrderByCreatedAtDesc(userId));
     }
 
     @Transactional(readOnly = true)

@@ -12,17 +12,21 @@ import java.util.List;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
-    List<Ticket> findByStatus(TicketStatus status);
-    List<Ticket> findByPriority(TicketPriority priority);
-    List<Ticket> findByCreatedBy_Id(Long userId);
-    List<Ticket> findByAssignedTo_Id(Long userId);
+    List<Ticket> findByStatusOrderByCreatedAtDesc(TicketStatus status);
+    List<Ticket> findByPriorityOrderByCreatedAtDesc(TicketPriority priority);
+    List<Ticket> findByCreatedBy_IdOrderByCreatedAtDesc(Long userId);
+    List<Ticket> findByAssignedTo_IdOrderByCreatedAtDesc(Long userId);
     List<Ticket> findByDepartment_Id(Long departmentId);
+
+    // Get all tickets ordered by creation date (newest first)
+    List<Ticket> findAllByOrderByCreatedAtDesc();
 
     @Query("SELECT t FROM Ticket t WHERE " +
            "(:status IS NULL OR t.status = :status) AND " +
            "(:priority IS NULL OR t.priority = :priority) AND " +
            "(:keyword IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-           "OR LOWER(t.description) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+           "OR LOWER(t.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+           "ORDER BY t.createdAt DESC")
     List<Ticket> searchTickets(@Param("status") TicketStatus status,
                                @Param("priority") TicketPriority priority,
                                @Param("keyword") String keyword);
