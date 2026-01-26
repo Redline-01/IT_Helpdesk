@@ -56,13 +56,17 @@ public class User {
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "createdBy")
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Ticket> createdTickets = new ArrayList<>();
 
     @OneToMany(mappedBy = "assignedTo")
     @Builder.Default
     private List<Ticket> assignedTickets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<TicketComment> comments = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

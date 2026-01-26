@@ -27,6 +27,95 @@
     color: #212529 !important;
 }
 
+/* Stats Cards - Force white text on colored backgrounds */
+.stats-card {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.stats-card.bg-primary,
+.stats-card.bg-warning,
+.stats-card.bg-info,
+.stats-card.bg-success,
+.stats-card.bg-danger,
+.stats-card.bg-secondary,
+.stats-card.bg-dark {
+    color: #ffffff !important;
+}
+
+.stats-card.bg-primary .card-body,
+.stats-card.bg-warning .card-body,
+.stats-card.bg-info .card-body,
+.stats-card.bg-success .card-body,
+.stats-card.bg-danger .card-body,
+.stats-card.bg-secondary .card-body,
+.stats-card.bg-dark .card-body {
+    color: #ffffff !important;
+}
+
+.stats-card.bg-primary h2,
+.stats-card.bg-primary h6,
+.stats-card.bg-warning h2,
+.stats-card.bg-warning h6,
+.stats-card.bg-info h2,
+.stats-card.bg-info h6,
+.stats-card.bg-success h2,
+.stats-card.bg-success h6,
+.stats-card.bg-danger h2,
+.stats-card.bg-danger h6,
+.stats-card.bg-secondary h2,
+.stats-card.bg-secondary h6,
+.stats-card.bg-dark h2,
+.stats-card.bg-dark h6 {
+    color: #ffffff !important;
+}
+
+.stats-card.bg-primary .card-subtitle,
+.stats-card.bg-primary .card-title,
+.stats-card.bg-warning .card-subtitle,
+.stats-card.bg-warning .card-title,
+.stats-card.bg-info .card-subtitle,
+.stats-card.bg-info .card-title,
+.stats-card.bg-success .card-subtitle,
+.stats-card.bg-success .card-title,
+.stats-card.bg-danger .card-subtitle,
+.stats-card.bg-danger .card-title,
+.stats-card.bg-secondary .card-subtitle,
+.stats-card.bg-secondary .card-title,
+.stats-card.bg-dark .card-subtitle,
+.stats-card.bg-dark .card-title {
+    color: #ffffff !important;
+}
+
+.stats-card.bg-primary i,
+.stats-card.bg-warning i,
+.stats-card.bg-info i,
+.stats-card.bg-success i,
+.stats-card.bg-danger i,
+.stats-card.bg-secondary i,
+.stats-card.bg-dark i {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.stats-card .card-body {
+    position: relative;
+    z-index: 1;
+}
+
+.stats-card .stats-icon {
+    transition: transform 0.3s ease;
+}
+
+.stats-card:hover .stats-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
 /* Table text colors */
 .table {
     color: #212529 !important;
@@ -47,31 +136,6 @@
 
 .table-hover tbody tr:hover td {
     color: #212529 !important;
-}
-
-/* Stats Cards */
-.stats-card {
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.stats-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
-
-.stats-card .card-body {
-    position: relative;
-    z-index: 1;
-}
-
-.stats-card .stats-icon {
-    transition: transform 0.3s ease;
-}
-
-.stats-card:hover .stats-icon {
-    transform: scale(1.1) rotate(5deg);
 }
 
 /* Chart Containers */

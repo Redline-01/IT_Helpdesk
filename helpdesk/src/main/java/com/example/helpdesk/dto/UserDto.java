@@ -22,6 +22,8 @@ public class UserDto {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
+    private String confirmPassword;
+
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
     @UniqueEmail

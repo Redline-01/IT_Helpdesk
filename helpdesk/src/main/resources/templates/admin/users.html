@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - IT Helpdesk</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{shared/navbar :: navbar}"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{shared/sidebar :: sidebar}"></div>
+
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" style="color: #212529;"><i class="fas fa-users-cog"></i> User Management</h1>
+                </div>
+
+                <!-- Flash Messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Users Table -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0" style="color: #212529;">
+                            <i class="fas fa-list"></i> All Users
+                            <span class="badge bg-primary" th:text="${#lists.size(users)}">0</span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Username</th>
+                                        <th>Full Name</th>
+                                        <th>Email</th>
+                                        <th>Department</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="user : ${users}">
+                                        <td class="fw-bold">#<span th:text="${user.id}">1</span></td>
+                                        <td>
+                                            <i class="fas fa-user-circle me-1"></i>
+                                            <span th:text="${user.username}">username</span>
+                                        </td>
+                                        <td th:text="${user.firstName + ' ' + user.lastName}">John Doe</td>
+                                        <td th:text="${user.email}">email@example.com</td>
+                                        <td th:text="${user.department?.name} ?: 'N/A'">IT Support</td>
+                                        <td>
+                                            <th:block th:each="role : ${user.roles}">
+                                                <span class="badge"
+                                                      th:classappend="${role.name == 'ROLE_ADMIN' ? 'bg-danger' : (role.name == 'ROLE_AGENT' ? 'bg-warning text-dark' : 'bg-secondary')}"
+                                                      th:text="${#strings.replace(role.name, 'ROLE_', '')}">
+                                                    ROLE
+                                                </span>
+                                            </th:block>
+                                        </td>
+                                        <td>
+                                            <span class="badge"
+                                                  th:classappend="${user.status.name() == 'ACTIVE' ? 'bg-success' : 'bg-secondary'}"
+                                                  th:text="${user.status}">
+                                                ACTIVE
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <!-- Change Role Dropdown -->
+                                                <div class="dropdown">
+                                                    <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="fas fa-user-tag"></i> Role
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li th:each="role : ${roles}">
+                                                            <form th:action="@{/admin/users/{id}/role(id=${user.id})}" method="post">
+                                                                <input type="hidden" name="roleName" th:value="${role.name}">
+                                                                <button type="submit" class="dropdown-item"
+                                                                        th:text="${#strings.replace(role.name, 'ROLE_', '')}">
+                                                                    ROLE
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+
+                                                <!-- Change Status Dropdown -->
+                                                <div class="dropdown ms-1">
+                                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="fas fa-toggle-on"></i> Status
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li th:each="status : ${statuses}">
+                                                            <form th:action="@{/admin/users/{id}/status(id=${user.id})}" method="post">
+                                                                <input type="hidden" name="status" th:value="${status}">
+                                                                <button type="submit" class="dropdown-item" th:text="${status}">
+                                                                    STATUS
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+
+                                                <!-- Delete User -->
+                                                <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post"
+                                                      class="ms-1"
+                                                      th:attr="onsubmit='return confirm(\'WARNING: This will permanently delete user ' + ${user.username} + ' and ALL their tickets! Are you sure?\');'">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete User (will delete all their tickets)">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Role Legend -->
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0" style="color: #212529;"><i class="fas fa-info-circle"></i> Role Permissions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card border-secondary">
+                                    <div class="card-header bg-secondary text-white">
+                                        <i class="fas fa-user"></i> USER
+                                    </div>
+                                    <div class="card-body" style="color: #212529;">
+                                        <ul class="small mb-0">
+                                            <li>Create tickets</li>
+                                            <li>View own tickets</li>
+                                            <li>Edit/delete own tickets</li>
+                                            <li>Add comments</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-warning">
+                                    <div class="card-header bg-warning text-dark">
+                                        <i class="fas fa-headset"></i> AGENT
+                                    </div>
+                                    <div class="card-body" style="color: #212529;">
+                                        <ul class="small mb-0">
+                                            <li>View all tickets</li>
+                                            <li>Claim unassigned tickets</li>
+                                            <li>Change ticket status</li>
+                                            <li>Add comments</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-danger">
+                                    <div class="card-header bg-danger text-white">
+                                        <i class="fas fa-crown"></i> ADMIN
+                                    </div>
+                                    <div class="card-body" style="color: #212529;">
+                                        <ul class="small mb-0">
+                                            <li>Full system access</li>
+                                            <li>Manage all users</li>
+                                            <li>Edit/delete any ticket</li>
+                                            <li>Assign tickets to anyone</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div th:replace="~{shared/footer :: footer}"></div>
+
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

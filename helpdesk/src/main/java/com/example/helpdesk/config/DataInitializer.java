@@ -10,7 +10,6 @@ import com.example.helpdesk.repository.RoleRepository;
 import com.example.helpdesk.repository.TicketRepository;
 import com.example.helpdesk.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -20,7 +19,6 @@ import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
@@ -31,8 +29,6 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        log.info("Initializing application data...");
-
         // Create Roles
         Role adminRole = createRoleIfNotExists("ROLE_ADMIN", "Administrator role with full access");
         Role agentRole = createRoleIfNotExists("ROLE_AGENT", "Agent role - can view all tickets and claim them");
@@ -57,7 +53,6 @@ public class DataInitializer implements CommandLineRunner {
                     .roles(new HashSet<>(Set.of(adminRole)))
                     .build();
             userRepository.save(admin);
-            log.info("Admin user created: username=admin, password=admin123");
         }
 
         // Create Regular User
@@ -74,7 +69,6 @@ public class DataInitializer implements CommandLineRunner {
                     .roles(new HashSet<>(Set.of(userRole)))
                     .build();
             userRepository.save(user);
-            log.info("Regular user created: username=user, password=user123");
         }
 
         // Create Agent User
@@ -91,7 +85,6 @@ public class DataInitializer implements CommandLineRunner {
                     .roles(new HashSet<>(Set.of(agentRole)))
                     .build();
             userRepository.save(agent);
-            log.info("Agent user created: username=agent, password=agent123");
         }
 
         // Create Sample Tickets
@@ -155,17 +148,7 @@ public class DataInitializer implements CommandLineRunner {
                     .department(itDept)
                     .build();
             ticketRepository.save(ticket5);
-
-            log.info("Sample tickets created");
         }
-
-        log.info("Data initialization completed!");
-        log.info("===========================================");
-        log.info("Test Accounts:");
-        log.info("Admin - username: admin, password: admin123");
-        log.info("User  - username: user, password: user123");
-        log.info("Agent - username: agent, password: agent123");
-        log.info("===========================================");
     }
 
     private Role createRoleIfNotExists(String name, String description) {

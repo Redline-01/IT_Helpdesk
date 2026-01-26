@@ -1,6 +1,7 @@
 package com.example.helpdesk.controller;
 
 import com.example.helpdesk.dto.UserDto;
+import com.example.helpdesk.repository.DepartmentRepository;
 import com.example.helpdesk.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AuthController {
 
     private final UserService userService;
+    private final DepartmentRepository departmentRepository;
 
     @GetMapping("/login")
     public String loginPage() {
@@ -28,14 +30,25 @@ public class AuthController {
     @GetMapping("/register")
     public String registerPage(Model model) {
         model.addAttribute("userDto", new UserDto());
+        model.addAttribute("departments", departmentRepository.findAll());
         return "auth/register";
     }
 
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("userDto") UserDto userDto,
                           BindingResult result,
+                          Model model,
                           RedirectAttributes redirectAttributes) {
+
+        // Server-side password confirmation validation
+        if (userDto.getPassword() != null && userDto.getConfirmPassword() != null) {
+            if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
+                result.rejectValue("confirmPassword", "error.userDto", "Passwords do not match");
+            }
+        }
+
         if (result.hasErrors()) {
+            model.addAttribute("departments", departmentRepository.findAll());
             return "auth/register";
         }
 

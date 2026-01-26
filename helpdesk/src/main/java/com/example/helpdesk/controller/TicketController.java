@@ -7,11 +7,11 @@ import com.example.helpdesk.enums.TicketCategory;
 import com.example.helpdesk.enums.TicketPriority;
 import com.example.helpdesk.enums.TicketStatus;
 import com.example.helpdesk.repository.DepartmentRepository;
+import com.example.helpdesk.service.TicketCommentService;
 import com.example.helpdesk.service.TicketService;
 import com.example.helpdesk.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,10 +22,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping("/tickets")
 @RequiredArgsConstructor
-@Slf4j
 public class TicketController {
 
     private final TicketService ticketService;
+    private final TicketCommentService commentService;
     private final UserService userService;
     private final DepartmentRepository departmentRepository;
 
@@ -33,30 +33,21 @@ public class TicketController {
     public String listTickets(Model model, Authentication authentication) {
         String username = authentication.getName();
 
-        log.info("=== Ticket List Access ===");
-        log.info("Username: {}", username);
-        log.info("Authorities: {}", authentication.getAuthorities());
-
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         boolean isAgent = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_AGENT"));
         boolean isUser = !isAdmin && !isAgent;
 
-        log.info("isAdmin: {}, isAgent: {}, isUser: {}", isAdmin, isAgent, isUser);
-
         if (isUser) {
-            // Regular users see only their own tickets
             User user = userService.getUserByUsername(username);
-            var tickets = ticketService.getTicketsByUser(user.getId());
-            log.info("USER - Loading {} tickets for user {}", tickets.size(), username);
-            model.addAttribute("tickets", tickets);
+            model.addAttribute("tickets", ticketService.getTicketsByUser(user.getId()));
         } else {
-            // Agents and Admins see all tickets
-            var tickets = ticketService.getAllTickets();
-            log.info("AGENT/ADMIN - Loading all {} tickets", tickets.size());
-            model.addAttribute("tickets", tickets);
+            model.addAttribute("tickets", ticketService.getAllTickets());
         }
+
+        model.addAttribute("currentUsername", username);
+        model.addAttribute("isAdmin", isAdmin);
         return "ticket/list";
     }
 
@@ -94,14 +85,42 @@ public class TicketController {
     }
 
     @GetMapping("/{id}")
-    public String viewTicket(@PathVariable Long id, Model model) {
-        model.addAttribute("ticket", ticketService.getTicketById(id));
+    public String viewTicket(@PathVariable Long id, Model model, Authentication authentication) {
+        var ticket = ticketService.getTicketById(id);
+        String username = authentication.getName();
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isAgent = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_AGENT"));
+        boolean isOwner = ticket.getCreatedByUsername() != null &&
+                         ticket.getCreatedByUsername().equals(username);
+
+        model.addAttribute("ticket", ticket);
+        model.addAttribute("comments", commentService.getCommentsByTicketId(id));
+        model.addAttribute("currentUsername", username);
+        model.addAttribute("isOwner", isOwner);
+        model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("isAgent", isAgent);
+        model.addAttribute("canEdit", isAdmin || isOwner);
+        model.addAttribute("canDelete", isAdmin || isOwner);
         return "ticket/view";
     }
 
     @GetMapping("/{id}/edit")
-    public String editTicketForm(@PathVariable Long id, Model model) {
+    public String editTicketForm(@PathVariable Long id, Model model, Authentication authentication) {
         var ticketDto = ticketService.getTicketById(id);
+        String username = authentication.getName();
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isOwner = ticketDto.getCreatedByUsername() != null &&
+                         ticketDto.getCreatedByUsername().equals(username);
+
+        // Only admin or owner can edit
+        if (!isAdmin && !isOwner) {
+            return "redirect:/access-denied";
+        }
 
         // Create TicketUpdateDto from TicketDto
         TicketUpdateDto updateDto = new TicketUpdateDto();
@@ -138,7 +157,20 @@ public class TicketController {
                               @Valid @ModelAttribute("ticketDto") TicketUpdateDto ticketDto,
                               BindingResult result,
                               Model model,
+                              Authentication authentication,
                               RedirectAttributes redirectAttributes) {
+        // Check ownership
+        var existingTicket = ticketService.getTicketById(id);
+        String username = authentication.getName();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isOwner = existingTicket.getCreatedByUsername() != null &&
+                         existingTicket.getCreatedByUsername().equals(username);
+
+        if (!isAdmin && !isOwner) {
+            return "redirect:/access-denied";
+        }
+
         if (result.hasErrors()) {
             model.addAttribute("ticket", ticketService.getTicketById(id));
             model.addAttribute("statuses", TicketStatus.values());
@@ -160,7 +192,22 @@ public class TicketController {
     }
 
     @PostMapping("/{id}/delete")
-    public String deleteTicket(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteTicket(@PathVariable Long id,
+                              Authentication authentication,
+                              RedirectAttributes redirectAttributes) {
+        // Check ownership
+        var ticket = ticketService.getTicketById(id);
+        String username = authentication.getName();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isOwner = ticket.getCreatedByUsername() != null &&
+                         ticket.getCreatedByUsername().equals(username);
+
+        if (!isAdmin && !isOwner) {
+            redirectAttributes.addFlashAttribute("error", "You don't have permission to delete this ticket.");
+            return "redirect:/tickets/" + id;
+        }
+
         try {
             ticketService.deleteTicket(id);
             redirectAttributes.addFlashAttribute("success", "Ticket deleted successfully!");
@@ -236,5 +283,38 @@ public class TicketController {
             redirectAttributes.addFlashAttribute("error", "Failed to update status: " + e.getMessage());
         }
         return "redirect:/tickets/" + id;
+    }
+
+    // Comment endpoints
+    @PostMapping("/{id}/comments")
+    public String addComment(@PathVariable Long id,
+                            @RequestParam String content,
+                            Authentication authentication,
+                            RedirectAttributes redirectAttributes) {
+        try {
+            String username = authentication.getName();
+            commentService.addComment(id, username, content);
+            redirectAttributes.addFlashAttribute("success", "Comment added successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to add comment: " + e.getMessage());
+        }
+        return "redirect:/tickets/" + id;
+    }
+
+    @PostMapping("/{ticketId}/comments/{commentId}/delete")
+    public String deleteComment(@PathVariable Long ticketId,
+                               @PathVariable Long commentId,
+                               Authentication authentication,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            String username = authentication.getName();
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            commentService.deleteComment(commentId, username, isAdmin);
+            redirectAttributes.addFlashAttribute("success", "Comment deleted successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to delete comment: " + e.getMessage());
+        }
+        return "redirect:/tickets/" + ticketId;
     }
 }

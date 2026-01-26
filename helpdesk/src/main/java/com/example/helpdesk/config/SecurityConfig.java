@@ -47,14 +47,12 @@ public class SecurityConfig {
                         // Public resources
                         .requestMatchers("/", "/home", "/auth/login", "/auth/register",
                                        "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
-                        // Admin only - full access to edit and delete
+                        // Admin only pages
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/tickets/*/delete").hasRole("ADMIN")
-                        .requestMatchers("/tickets/*/edit").hasRole("ADMIN")
                         // Agent and Admin - claim tickets and change status
                         .requestMatchers("/tickets/*/claim").hasAnyRole("AGENT", "ADMIN")
                         .requestMatchers("/tickets/*/status").hasAnyRole("AGENT", "ADMIN")
-                        // All authenticated users - access tickets (filtering done in controller)
+                        // All authenticated users - access tickets (ownership check done in controller)
                         .requestMatchers("/tickets/**", "/dashboard/**").hasAnyRole("USER", "AGENT", "ADMIN")
                         // API endpoints
                         .requestMatchers("/api/**").hasAnyRole("USER", "AGENT", "ADMIN")

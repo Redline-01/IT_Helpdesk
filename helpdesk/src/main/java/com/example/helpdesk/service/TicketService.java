@@ -12,7 +12,6 @@ import com.example.helpdesk.mapper.TicketMapper;
 import com.example.helpdesk.repository.DepartmentRepository;
 import com.example.helpdesk.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +20,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class TicketService {
 
     private final TicketRepository ticketRepository;
@@ -34,7 +32,6 @@ public class TicketService {
         try {
             return ticketMapper.toDtoList(ticketRepository.findAllByOrderByCreatedAtDesc());
         } catch (Exception e) {
-            log.error("Error mapping tickets: {}", e.getMessage(), e);
             return Collections.emptyList();
         }
     }
@@ -122,7 +119,6 @@ public class TicketService {
         try {
             return ticketMapper.toDtoList(ticketRepository.searchTickets(status, priority, keyword));
         } catch (Exception e) {
-            log.error("Error searching tickets: {}", e.getMessage(), e);
             return Collections.emptyList();
         }
     }

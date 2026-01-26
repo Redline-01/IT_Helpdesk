@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - IT Helpdesk</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body {
+            background-color: #f0f2f5 !important;
+        }
+        main {
+            background-color: #f0f2f5 !important;
+        }
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            border: 3px solid white;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+        }
+        .card-header {
+            background-color: #e9ecef;
+            border-radius: 12px 12px 0 0 !important;
+            color: #212529;
+        }
+        .card-body {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        .form-label {
+            color: #212529;
+            font-weight: 500;
+        }
+        .form-control, .form-select {
+            color: #212529;
+        }
+        .role-badge {
+            font-size: 0.9rem;
+            padding: 8px 16px;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{shared/navbar :: navbar}"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{shared/sidebar :: sidebar}"></div>
+
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" style="color: #212529;"><i class="fas fa-user-circle"></i> My Profile</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <a th:href="@{/dashboard}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Flash Messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="profile-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h2 class="mb-1" th:text="${user.firstName + ' ' + user.lastName}">User Name</h2>
+                            <p class="mb-2">@<span th:text="${user.username}">username</span></p>
+                            <div>
+                                <th:block th:each="role : ${user.roles}">
+                                    <span class="badge role-badge"
+                                          th:classappend="${role.name == 'ROLE_ADMIN' ? 'bg-danger' : (role.name == 'ROLE_AGENT' ? 'bg-warning text-dark' : 'bg-secondary')}"
+                                          th:text="${#strings.replace(role.name, 'ROLE_', '')}">
+                                        ROLE
+                                    </span>
+                                </th:block>
+                            </div>
+                        </div>
+                        <div class="col-auto text-end">
+                            <p class="mb-1"><i class="fas fa-envelope"></i> <span th:text="${user.email}">email@example.com</span></p>
+                            <p class="mb-1" th:if="${user.phoneNumber}"><i class="fas fa-phone"></i> <span th:text="${user.phoneNumber}">+123456789</span></p>
+                            <p class="mb-0" th:if="${user.department}"><i class="fas fa-building"></i> <span th:text="${user.department.name}">Department</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Profile Information -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header">
+                                <h5 class="mb-0" style="color: #212529;"><i class="fas fa-user-edit"></i> Edit Profile</h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/profile/update}" method="post">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="firstName" class="form-label">First Name</label>
+                                            <input type="text" class="form-control" id="firstName" name="firstName"
+                                                   th:value="${user.firstName}" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="lastName" class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" id="lastName" name="lastName"
+                                                   th:value="${user.lastName}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email Address</label>
+                                        <input type="email" class="form-control" id="email" name="email"
+                                               th:value="${user.email}" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="phoneNumber" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
+                                               th:value="${user.phoneNumber}">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="departmentId" class="form-label">Department</label>
+                                        <select class="form-select" id="departmentId" name="departmentId">
+                                            <option value="">Select Department</option>
+                                            <option th:each="dept : ${departments}"
+                                                    th:value="${dept.id}"
+                                                    th:text="${dept.name}"
+                                                    th:selected="${user.department != null && user.department.id == dept.id}">
+                                                Department
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Username</label>
+                                        <input type="text" class="form-control" th:value="${user.username}" disabled>
+                                        <small class="text-muted">Username cannot be changed</small>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Save Changes
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Change Password -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header">
+                                <h5 class="mb-0" style="color: #212529;"><i class="fas fa-key"></i> Change Password</h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/profile/change-password}" method="post">
+                                    <div class="mb-3">
+                                        <label for="currentPassword" class="form-label">Current Password</label>
+                                        <input type="password" class="form-control" id="currentPassword"
+                                               name="currentPassword" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="newPassword" class="form-label">New Password</label>
+                                        <input type="password" class="form-control" id="newPassword"
+                                               name="newPassword" required minlength="6">
+                                        <small class="text-muted">Minimum 6 characters</small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                                        <input type="password" class="form-control" id="confirmPassword"
+                                               name="confirmPassword" required minlength="6">
+                                    </div>
+
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-lock"></i> Change Password
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Account Info -->
+                        <div class="card shadow-sm mt-4">
+                            <div class="card-header">
+                                <h5 class="mb-0" style="color: #212529;"><i class="fas fa-info-circle"></i> Account Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2">
+                                        <strong><i class="fas fa-calendar-plus text-primary"></i> Account Created:</strong>
+                                        <span th:text="${#temporals.format(user.createdAt, 'MMMM dd, yyyy HH:mm')}">January 01, 2026</span>
+                                    </li>
+                                    <li class="mb-2" th:if="${user.lastLogin}">
+                                        <strong><i class="fas fa-sign-in-alt text-success"></i> Last Login:</strong>
+                                        <span th:text="${#temporals.format(user.lastLogin, 'MMMM dd, yyyy HH:mm')}">January 26, 2026</span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <strong><i class="fas fa-toggle-on text-info"></i> Status:</strong>
+                                        <span class="badge"
+                                              th:classappend="${user.status.name() == 'ACTIVE' ? 'bg-success' : 'bg-secondary'}"
+                                              th:text="${user.status}">ACTIVE</span>
+                                    </li>
+                                    <li>
+                                        <strong><i class="fas fa-ticket-alt text-warning"></i> Tickets Created:</strong>
+                                        <span th:text="${#lists.size(user.createdTickets)}">0</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div th:replace="~{shared/footer :: footer}"></div>
+
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

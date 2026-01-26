@@ -8,6 +8,17 @@
     <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <style>
+        body {
+            background-color: #f0f2f5 !important;
+        }
+        main {
+            background-color: #f0f2f5 !important;
+        }
+        .h2, h1, h2 {
+            color: #212529 !important;
+        }
+    </style>
 </head>
 <body>
     <div th:replace="~{shared/navbar :: navbar}"></div>
@@ -20,24 +31,27 @@
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><i class="fas fa-crown"></i> Admin Dashboard</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="refreshStats()">
+                        <a th:href="@{/tickets/create}" class="btn btn-primary me-2">
+                            <i class="fas fa-plus"></i> New Ticket
+                        </a>
+                        <a th:href="@{/dashboard}" class="btn btn-outline-secondary">
                             <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
+                        </a>
                     </div>
                 </div>
 
                 <!-- Admin Stats Cards -->
                 <div class="row g-4 mb-4">
                     <div class="col-md-3">
-                        <div class="card stats-card bg-gradient text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="card stats-card text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="card-subtitle mb-2">Total Tickets</h6>
-                                        <h2 class="card-title mb-0" th:text="${stats.totalTickets}">0</h2>
+                                        <h6 class="card-subtitle mb-2 text-white">Total Tickets</h6>
+                                        <h2 class="card-title mb-0 text-white" th:text="${stats.totalTickets}">0</h2>
                                     </div>
                                     <div class="stats-icon">
-                                        <i class="fas fa-ticket-alt fa-3x opacity-75"></i>
+                                        <i class="fas fa-ticket-alt fa-3x" style="color: rgba(255,255,255,0.7);"></i>
                                     </div>
                                 </div>
                             </div>
@@ -45,15 +59,15 @@
                     </div>
 
                     <div class="col-md-3">
-                        <div class="card stats-card bg-warning text-white">
+                        <div class="card stats-card bg-warning">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="card-subtitle mb-2">Open</h6>
-                                        <h2 class="card-title mb-0" th:text="${stats.openTickets}">0</h2>
+                                        <h6 class="card-subtitle mb-2 text-white">Open</h6>
+                                        <h2 class="card-title mb-0 text-white" th:text="${stats.openTickets}">0</h2>
                                     </div>
                                     <div class="stats-icon">
-                                        <i class="fas fa-folder-open fa-3x opacity-75"></i>
+                                        <i class="fas fa-folder-open fa-3x" style="color: rgba(255,255,255,0.7);"></i>
                                     </div>
                                 </div>
                             </div>
@@ -61,15 +75,15 @@
                     </div>
 
                     <div class="col-md-3">
-                        <div class="card stats-card bg-info text-white">
+                        <div class="card stats-card bg-info">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="card-subtitle mb-2">In Progress</h6>
-                                        <h2 class="card-title mb-0" th:text="${stats.inProgressTickets}">0</h2>
+                                        <h6 class="card-subtitle mb-2 text-white">In Progress</h6>
+                                        <h2 class="card-title mb-0 text-white" th:text="${stats.inProgressTickets}">0</h2>
                                     </div>
                                     <div class="stats-icon">
-                                        <i class="fas fa-spinner fa-3x opacity-75"></i>
+                                        <i class="fas fa-spinner fa-3x" style="color: rgba(255,255,255,0.7);"></i>
                                     </div>
                                 </div>
                             </div>
@@ -77,15 +91,15 @@
                     </div>
 
                     <div class="col-md-3">
-                        <div class="card stats-card bg-success text-white">
+                        <div class="card stats-card bg-success">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="card-subtitle mb-2">Resolved</h6>
-                                        <h2 class="card-title mb-0" th:text="${stats.resolvedTickets}">0</h2>
+                                        <h6 class="card-subtitle mb-2 text-white">Resolved</h6>
+                                        <h2 class="card-title mb-0 text-white" th:text="${stats.resolvedTickets}">0</h2>
                                     </div>
                                     <div class="stats-icon">
-                                        <i class="fas fa-check-circle fa-3x opacity-75"></i>
+                                        <i class="fas fa-check-circle fa-3x" style="color: rgba(255,255,255,0.7);"></i>
                                     </div>
                                 </div>
                             </div>
@@ -96,15 +110,15 @@
                 <!-- Priority Stats -->
                 <div class="row g-4 mb-4">
                     <div class="col-md-6">
-                        <div class="card stats-card bg-danger text-white">
+                        <div class="card stats-card bg-danger">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="card-subtitle mb-2">Urgent Tickets</h6>
-                                        <h2 class="card-title mb-0" th:text="${stats.urgentTickets}">0</h2>
+                                        <h6 class="card-subtitle mb-2 text-white">Urgent Tickets</h6>
+                                        <h2 class="card-title mb-0 text-white" th:text="${stats.urgentTickets}">0</h2>
                                     </div>
                                     <div class="stats-icon">
-                                        <i class="fas fa-exclamation-triangle fa-3x opacity-75"></i>
+                                        <i class="fas fa-exclamation-triangle fa-3x" style="color: rgba(255,255,255,0.7);"></i>
                                     </div>
                                 </div>
                             </div>
@@ -112,15 +126,15 @@
                     </div>
 
                     <div class="col-md-6">
-                        <div class="card stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                        <div class="card stats-card text-white" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="card-subtitle mb-2">High Priority</h6>
-                                        <h2 class="card-title mb-0" th:text="${stats.highPriorityTickets}">0</h2>
+                                        <h6 class="card-subtitle mb-2 text-white">High Priority</h6>
+                                        <h2 class="card-title mb-0 text-white" th:text="${stats.highPriorityTickets}">0</h2>
                                     </div>
                                     <div class="stats-icon">
-                                        <i class="fas fa-fire fa-3x opacity-75"></i>
+                                        <i class="fas fa-fire fa-3x" style="color: rgba(255,255,255,0.7);"></i>
                                     </div>
                                 </div>
                             </div>
@@ -131,22 +145,22 @@
                 <!-- Charts -->
                 <div class="row g-4 mb-4">
                     <div class="col-md-6">
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-white" style="color: #212529;">
+                        <div class="card shadow-sm" style="background-color: #f8f9fa;">
+                            <div class="card-header" style="background-color: #e9ecef; color: #212529;">
                                 <h5 class="mb-0" style="color: #212529;"><i class="fas fa-chart-pie"></i> Ticket Status Distribution</h5>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body" style="background-color: #f8f9fa;">
                                 <canvas id="adminStatusChart"></canvas>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-md-6">
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-white" style="color: #212529;">
+                        <div class="card shadow-sm" style="background-color: #f8f9fa;">
+                            <div class="card-header" style="background-color: #e9ecef; color: #212529;">
                                 <h5 class="mb-0" style="color: #212529;"><i class="fas fa-chart-bar"></i> Priority Analysis</h5>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body" style="background-color: #f8f9fa;">
                                 <canvas id="adminPriorityChart"></canvas>
                             </div>
                         </div>
@@ -154,11 +168,11 @@
                 </div>
 
                 <!-- Recent Activity -->
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white" style="color: #212529;">
+                <div class="card shadow-sm" style="background-color: #f8f9fa;">
+                    <div class="card-header" style="background-color: #e9ecef; color: #212529;">
                         <h5 class="mb-0" style="color: #212529;"><i class="fas fa-history"></i> Recent Tickets</h5>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="background-color: #f8f9fa;">
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
@@ -227,7 +241,13 @@
                 maintainAspectRatio: true,
                 plugins: {
                     legend: {
-                        position: 'bottom'
+                        position: 'bottom',
+                        labels: {
+                            color: '#212529',
+                            font: {
+                                size: 12
+                            }
+                        }
                     }
                 }
             }
@@ -250,20 +270,35 @@
                 maintainAspectRatio: true,
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#212529'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#212529'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#212529'
+                        }
                     }
                 }
             }
         });
 
         function refreshStats() {
-            fetch('/api/stats')
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Stats refreshed:', data);
-                    location.reload();
-                })
-                .catch(error => console.error('Error:', error));
+            location.reload();
         }
         /*]]>*/
     </script>
