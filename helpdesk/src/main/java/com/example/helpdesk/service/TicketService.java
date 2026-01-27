@@ -12,6 +12,8 @@ import com.example.helpdesk.mapper.TicketMapper;
 import com.example.helpdesk.repository.DepartmentRepository;
 import com.example.helpdesk.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,18 @@ public class TicketService {
         } catch (Exception e) {
             return Collections.emptyList();
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Page<TicketDto> getAllTicketsPaginated(Pageable pageable) {
+        Page<Ticket> ticketPage = ticketRepository.findAll(pageable);
+        return ticketPage.map(ticketMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<TicketDto> getTicketsByUserPaginated(Long userId, Pageable pageable) {
+        Page<Ticket> ticketPage = ticketRepository.findByCreatedBy_Id(userId, pageable);
+        return ticketPage.map(ticketMapper::toDto);
     }
 
     @Transactional(readOnly = true)

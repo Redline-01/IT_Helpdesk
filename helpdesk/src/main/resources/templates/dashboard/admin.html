@@ -34,9 +34,31 @@
                         <a th:href="@{/tickets/create}" class="btn btn-primary me-2">
                             <i class="fas fa-plus"></i> New Ticket
                         </a>
-                        <a th:href="@{/dashboard}" class="btn btn-outline-secondary">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </a>
+                        <button type="button" class="btn btn-outline-secondary" id="refreshStatsBtn">
+                            <i class="fas fa-sync-alt" id="refreshIcon"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Toast Container -->
+                <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+                    <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <span id="successToastMessage">Stats refreshed successfully!</span>
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                        </div>
+                    </div>
+                    <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <span id="errorToastMessage">Failed to refresh stats</span>
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                        </div>
                     </div>
                 </div>
 
@@ -48,7 +70,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="card-subtitle mb-2 text-white">Total Tickets</h6>
-                                        <h2 class="card-title mb-0 text-white" th:text="${stats.totalTickets}">0</h2>
+                                        <h2 class="card-title mb-0 text-white" id="totalTickets" th:text="${stats.totalTickets}">0</h2>
                                     </div>
                                     <div class="stats-icon">
                                         <i class="fas fa-ticket-alt fa-3x" style="color: rgba(255,255,255,0.7);"></i>
@@ -64,7 +86,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="card-subtitle mb-2 text-white">Open</h6>
-                                        <h2 class="card-title mb-0 text-white" th:text="${stats.openTickets}">0</h2>
+                                        <h2 class="card-title mb-0 text-white" id="openTickets" th:text="${stats.openTickets}">0</h2>
                                     </div>
                                     <div class="stats-icon">
                                         <i class="fas fa-folder-open fa-3x" style="color: rgba(255,255,255,0.7);"></i>
@@ -80,7 +102,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="card-subtitle mb-2 text-white">In Progress</h6>
-                                        <h2 class="card-title mb-0 text-white" th:text="${stats.inProgressTickets}">0</h2>
+                                        <h2 class="card-title mb-0 text-white" id="inProgressTickets" th:text="${stats.inProgressTickets}">0</h2>
                                     </div>
                                     <div class="stats-icon">
                                         <i class="fas fa-spinner fa-3x" style="color: rgba(255,255,255,0.7);"></i>
@@ -96,7 +118,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="card-subtitle mb-2 text-white">Resolved</h6>
-                                        <h2 class="card-title mb-0 text-white" th:text="${stats.resolvedTickets}">0</h2>
+                                        <h2 class="card-title mb-0 text-white" id="resolvedTickets" th:text="${stats.resolvedTickets}">0</h2>
                                     </div>
                                     <div class="stats-icon">
                                         <i class="fas fa-check-circle fa-3x" style="color: rgba(255,255,255,0.7);"></i>
@@ -115,7 +137,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="card-subtitle mb-2 text-white">Urgent Tickets</h6>
-                                        <h2 class="card-title mb-0 text-white" th:text="${stats.urgentTickets}">0</h2>
+                                        <h2 class="card-title mb-0 text-white" id="urgentTickets" th:text="${stats.urgentTickets}">0</h2>
                                     </div>
                                     <div class="stats-icon">
                                         <i class="fas fa-exclamation-triangle fa-3x" style="color: rgba(255,255,255,0.7);"></i>
@@ -131,7 +153,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="card-subtitle mb-2 text-white">High Priority</h6>
-                                        <h2 class="card-title mb-0 text-white" th:text="${stats.highPriorityTickets}">0</h2>
+                                        <h2 class="card-title mb-0 text-white" id="highPriorityTickets" th:text="${stats.highPriorityTickets}">0</h2>
                                     </div>
                                     <div class="stats-icon">
                                         <i class="fas fa-fire fa-3x" style="color: rgba(255,255,255,0.7);"></i>
@@ -227,7 +249,7 @@
 
         // Status Chart
         const statusCtx = document.getElementById('adminStatusChart').getContext('2d');
-        new Chart(statusCtx, {
+        const statusChart = new Chart(statusCtx, {
             type: 'doughnut',
             data: {
                 labels: ['Open', 'In Progress', 'Resolved', 'Closed'],
@@ -255,7 +277,7 @@
 
         // Priority Chart
         const priorityCtx = document.getElementById('adminPriorityChart').getContext('2d');
-        new Chart(priorityCtx, {
+        const priorityChart = new Chart(priorityCtx, {
             type: 'bar',
             data: {
                 labels: ['Urgent', 'High Priority'],
@@ -297,8 +319,49 @@
             }
         });
 
-        function refreshStats() {
-            location.reload();
+        // AJAX Refresh Stats
+        document.getElementById('refreshStatsBtn').addEventListener('click', function() {
+            const refreshIcon = document.getElementById('refreshIcon');
+            refreshIcon.classList.add('fa-spin');
+
+            fetch('/api/stats')
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to fetch stats');
+                    return response.json();
+                })
+                .then(data => {
+                    // Update stats on page
+                    document.getElementById('totalTickets').textContent = data.totalTickets;
+                    document.getElementById('openTickets').textContent = data.openTickets;
+                    document.getElementById('inProgressTickets').textContent = data.inProgressTickets;
+                    document.getElementById('resolvedTickets').textContent = data.resolvedTickets;
+                    document.getElementById('urgentTickets').textContent = data.urgentTickets;
+                    document.getElementById('highPriorityTickets').textContent = data.highPriorityTickets;
+
+                    // Update charts
+                    statusChart.data.datasets[0].data = [data.openTickets, data.inProgressTickets, data.resolvedTickets, data.closedTickets];
+                    statusChart.update();
+
+                    priorityChart.data.datasets[0].data = [data.urgentTickets, data.highPriorityTickets];
+                    priorityChart.update();
+
+                    // Show success toast
+                    showToast('success', 'Stats refreshed successfully!');
+                })
+                .catch(error => {
+                    showToast('error', 'Failed to refresh stats: ' + error.message);
+                })
+                .finally(() => {
+                    refreshIcon.classList.remove('fa-spin');
+                });
+        });
+
+        function showToast(type, message) {
+            const toastId = type === 'success' ? 'successToast' : 'errorToast';
+            const messageId = type === 'success' ? 'successToastMessage' : 'errorToastMessage';
+            document.getElementById(messageId).textContent = message;
+            const toast = new bootstrap.Toast(document.getElementById(toastId));
+            toast.show();
         }
         /*]]>*/
     </script>

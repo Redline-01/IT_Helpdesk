@@ -3,6 +3,8 @@ package com.example.helpdesk.repository;
 import com.example.helpdesk.entity.Ticket;
 import com.example.helpdesk.enums.TicketStatus;
 import com.example.helpdesk.enums.TicketPriority;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,6 +19,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByCreatedBy_IdOrderByCreatedAtDesc(Long userId);
     List<Ticket> findByAssignedTo_IdOrderByCreatedAtDesc(Long userId);
     List<Ticket> findByDepartment_Id(Long departmentId);
+
+    // Paginated methods
+    Page<Ticket> findByCreatedBy_Id(Long userId, Pageable pageable);
 
     // Get all tickets ordered by creation date (newest first)
     List<Ticket> findAllByOrderByCreatedAtDesc();

@@ -8,6 +8,10 @@ import com.example.helpdesk.repository.RoleRepository;
 import com.example.helpdesk.repository.TicketRepository;
 import com.example.helpdesk.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -31,12 +35,20 @@ public class AdminController {
     private final TicketRepository ticketRepository;
 
     @GetMapping("/users")
-    public String listUsers(Model model) {
-        List<User> users = userRepository.findAll();
+    public String listUsers(@RequestParam(defaultValue = "0") int page,
+                           @RequestParam(defaultValue = "10") int size,
+                           Model model) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<User> userPage = userRepository.findAll(pageable);
         List<Role> roles = roleRepository.findAll();
-        model.addAttribute("users", users);
+
+        model.addAttribute("users", userPage.getContent());
         model.addAttribute("roles", roles);
         model.addAttribute("statuses", UserStatus.values());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", userPage.getTotalPages());
+        model.addAttribute("totalItems", userPage.getTotalElements());
+        model.addAttribute("pageSize", size);
         return "admin/users";
     }
 

@@ -1,6 +1,7 @@
 package com.example.helpdesk.controller;
 
 import com.example.helpdesk.dto.TicketCreateDto;
+import com.example.helpdesk.dto.TicketDto;
 import com.example.helpdesk.dto.TicketUpdateDto;
 import com.example.helpdesk.entity.User;
 import com.example.helpdesk.enums.TicketCategory;
@@ -12,6 +13,10 @@ import com.example.helpdesk.service.TicketService;
 import com.example.helpdesk.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,7 +35,10 @@ public class TicketController {
     private final DepartmentRepository departmentRepository;
 
     @GetMapping
-    public String listTickets(Model model, Authentication authentication) {
+    public String listTickets(@RequestParam(defaultValue = "0") int page,
+                             @RequestParam(defaultValue = "10") int size,
+                             Model model,
+                             Authentication authentication) {
         String username = authentication.getName();
 
         boolean isAdmin = authentication.getAuthorities().stream()
@@ -39,13 +47,21 @@ public class TicketController {
                 .anyMatch(a -> a.getAuthority().equals("ROLE_AGENT"));
         boolean isUser = !isAdmin && !isAgent;
 
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<TicketDto> ticketPage;
+
         if (isUser) {
             User user = userService.getUserByUsername(username);
-            model.addAttribute("tickets", ticketService.getTicketsByUser(user.getId()));
+            ticketPage = ticketService.getTicketsByUserPaginated(user.getId(), pageable);
         } else {
-            model.addAttribute("tickets", ticketService.getAllTickets());
+            ticketPage = ticketService.getAllTicketsPaginated(pageable);
         }
 
+        model.addAttribute("tickets", ticketPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", ticketPage.getTotalPages());
+        model.addAttribute("totalItems", ticketPage.getTotalElements());
+        model.addAttribute("pageSize", size);
         model.addAttribute("currentUsername", username);
         model.addAttribute("isAdmin", isAdmin);
         return "ticket/list";
@@ -98,6 +114,7 @@ public class TicketController {
 
         model.addAttribute("ticket", ticket);
         model.addAttribute("comments", commentService.getCommentsByTicketId(id));
+        model.addAttribute("statuses", TicketStatus.values());
         model.addAttribute("currentUsername", username);
         model.addAttribute("isOwner", isOwner);
         model.addAttribute("isAdmin", isAdmin);
