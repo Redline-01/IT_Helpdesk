@@ -116,65 +116,8 @@ function createBarChart(canvasId, labels, data, label, color) {
     });
 }
 
-// Create Line Chart
-function createLineChart(canvasId, labels, datasets) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) return null;
 
-    return new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: datasets
-        },
-        options: {
-            ...commonOptions,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    }
-                }
-            },
-            elements: {
-                line: {
-                    tension: 0.4
-                },
-                point: {
-                    radius: 4,
-                    hitRadius: 10,
-                    hoverRadius: 6
-                }
-            }
-        }
-    });
-}
 
-// Create Pie Chart
-function createPieChart(canvasId, labels, data, colors) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) return null;
-
-    return new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: data,
-                backgroundColor: colors,
-                borderWidth: 2,
-                borderColor: '#fff'
-            }]
-        },
-        options: commonOptions
-    });
-}
 
 // Fetch and render dashboard charts
 function renderDashboardCharts() {
@@ -226,14 +169,3 @@ setInterval(function() {
     renderDashboardCharts();
 }, 300000);
 
-// Export chart as image
-function exportChartAsImage(chartId, filename) {
-    const canvas = document.getElementById(chartId);
-    if (!canvas) return;
-
-    const url = canvas.toDataURL('image/png');
-    const link = document.createElement('a');
-    link.download = filename || 'chart.png';
-    link.href = url;
-    link.click();
-}
