@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
-    <nav th:fragment="sidebar" class="col-md-2 d-md-block bg-light sidebar">
+    <!-- Mobile Sidebar Toggle Button -->
+    <button th:fragment="sidebarToggle" class="btn btn-primary sidebar-toggle d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Desktop Sidebar -->
+    <nav th:fragment="sidebar" class="col-md-2 d-none d-md-block bg-light sidebar">
         <div class="position-sticky pt-3">
             <ul class="nav flex-column">
                 <li class="nav-item">
@@ -51,5 +57,63 @@
             </ul>
         </div>
     </nav>
+
+    <!-- Mobile Offcanvas Sidebar -->
+    <div th:fragment="mobileSidebar" class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
+        <div class="offcanvas-header bg-primary text-white">
+            <h5 class="offcanvas-title" id="mobileSidebarLabel">
+                <i class="fas fa-headset me-2"></i> IT Helpdesk
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/dashboard}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/tickets}">
+                        <i class="fas fa-ticket-alt"></i> All Tickets
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/tickets/create}">
+                        <i class="fas fa-plus-circle"></i> New Ticket
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/tickets/search}">
+                        <i class="fas fa-search"></i> Search Tickets
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Account Section -->
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span><i class="fas fa-user"></i> Account</span>
+            </h6>
+            <ul class="nav flex-column mb-2">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/profile}">
+                        <i class="fas fa-user-circle"></i> My Profile
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Admin Section -->
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted" sec:authorize="hasRole('ADMIN')">
+                <span><i class="fas fa-cog"></i> Administration</span>
+            </h6>
+            <ul class="nav flex-column mb-2" sec:authorize="hasRole('ADMIN')">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/users}">
+                        <i class="fas fa-users-cog"></i> Manage Users
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
 </body>
 </html>

@@ -83,7 +83,7 @@
                     <div class="card-header bg-white" style="color: #212529;">
                         <h5 class="mb-0" style="color: #212529;">
                             <i class="fas fa-list-alt"></i> Search Results
-                            <span class="badge bg-primary" th:text="${#lists.size(tickets)}">0</span>
+                            <span class="badge bg-primary" th:text="${totalItems}">0</span>
                         </h5>
                     </div>
                     <div class="card-body p-0">
@@ -143,6 +143,52 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Pagination -->
+                        <div th:if="${totalPages > 1}" class="d-flex justify-content-between align-items-center p-3 border-top">
+                            <div class="text-muted">
+                                Showing page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">1</span>
+                                (<span th:text="${totalItems}">0</span> total results)
+                            </div>
+                            <nav aria-label="Search results pagination">
+                                <ul class="pagination mb-0">
+                                    <!-- Previous Button -->
+                                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                        <a class="page-link" th:href="@{/tickets/search(status=${selectedStatus}, priority=${selectedPriority}, keyword=${keyword}, page=${currentPage - 1}, size=${pageSize})}">
+                                            <i class="fas fa-chevron-left"></i> Previous
+                                        </a>
+                                    </li>
+
+                                    <!-- Page Numbers -->
+                                    <th:block th:with="startPage=${currentPage > 2 ? currentPage - 2 : 0}, endPage=${(startPage + 4) < totalPages ? (startPage + 4) : (totalPages - 1)}">
+                                        <li th:if="${startPage > 0}" class="page-item">
+                                            <a class="page-link" th:href="@{/tickets/search(status=${selectedStatus}, priority=${selectedPriority}, keyword=${keyword}, page=0, size=${pageSize})}">1</a>
+                                        </li>
+                                        <li th:if="${startPage > 1}" class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                        <li th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                                            class="page-item"
+                                            th:classappend="${i == currentPage} ? 'active'">
+                                            <a class="page-link" th:href="@{/tickets/search(status=${selectedStatus}, priority=${selectedPriority}, keyword=${keyword}, page=${i}, size=${pageSize})}" th:text="${i + 1}">1</a>
+                                        </li>
+                                        <li th:if="${endPage < totalPages - 2}" class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                        <li th:if="${endPage < totalPages - 1}" class="page-item">
+                                            <a class="page-link" th:href="@{/tickets/search(status=${selectedStatus}, priority=${selectedPriority}, keyword=${keyword}, page=${totalPages - 1}, size=${pageSize})}" th:text="${totalPages}">10</a>
+                                        </li>
+                                    </th:block>
+
+                                    <!-- Next Button -->
+                                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                                        <a class="page-link" th:href="@{/tickets/search(status=${selectedStatus}, priority=${selectedPriority}, keyword=${keyword}, page=${currentPage + 1}, size=${pageSize})}">
+                                            Next <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
                     </div>
                 </div>
             </main>
@@ -152,5 +198,9 @@
     <div th:replace="~{shared/footer :: footer}"></div>
 
     <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+
+    <!-- Mobile Sidebar Toggle and Offcanvas -->
+    <div th:replace="~{shared/sidebar :: sidebarToggle}"></div>
+    <div th:replace="~{shared/sidebar :: mobileSidebar}"></div>
 </body>
 </html>

@@ -238,6 +238,8 @@ public class TicketController {
     public String searchTickets(@RequestParam(required = false) TicketStatus status,
                                @RequestParam(required = false) TicketPriority priority,
                                @RequestParam(required = false) String keyword,
+                               @RequestParam(defaultValue = "0") int page,
+                               @RequestParam(defaultValue = "10") int size,
                                Model model,
                                Authentication authentication) {
         try {
@@ -249,21 +251,29 @@ public class TicketController {
                     .anyMatch(a -> a.getAuthority().equals("ROLE_AGENT"));
             boolean isUser = !isAdmin && !isAgent;
 
-            var tickets = ticketService.searchTickets(status, priority, keyword);
+            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+            Page<TicketDto> ticketPage;
 
             if (isUser) {
                 // Filter to show only user's own tickets
                 User user = userService.getUserByUsername(username);
-                tickets = tickets.stream()
-                        .filter(t -> t.getCreatedByUsername() != null &&
-                                   t.getCreatedByUsername().equals(username))
-                        .toList();
+                ticketPage = ticketService.searchTicketsByUserPaginated(user.getId(), status, priority, keyword, pageable);
+            } else {
+                ticketPage = ticketService.searchTicketsPaginated(status, priority, keyword, pageable);
             }
 
-            model.addAttribute("tickets", tickets != null ? tickets : java.util.Collections.emptyList());
+            model.addAttribute("tickets", ticketPage.getContent());
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", ticketPage.getTotalPages());
+            model.addAttribute("totalItems", ticketPage.getTotalElements());
+            model.addAttribute("pageSize", size);
         } catch (Exception e) {
             model.addAttribute("tickets", java.util.Collections.emptyList());
             model.addAttribute("error", "Error searching tickets: " + e.getMessage());
+            model.addAttribute("currentPage", 0);
+            model.addAttribute("totalPages", 0);
+            model.addAttribute("totalItems", 0);
+            model.addAttribute("pageSize", size);
         }
 
         model.addAttribute("statuses", TicketStatus.values());

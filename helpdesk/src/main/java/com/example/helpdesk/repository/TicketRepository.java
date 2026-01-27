@@ -36,6 +36,28 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
                                @Param("priority") TicketPriority priority,
                                @Param("keyword") String keyword);
 
+    @Query("SELECT t FROM Ticket t WHERE " +
+           "(:status IS NULL OR t.status = :status) AND " +
+           "(:priority IS NULL OR t.priority = :priority) AND " +
+           "(:keyword IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "OR LOWER(t.description) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<Ticket> searchTicketsPaginated(@Param("status") TicketStatus status,
+                                        @Param("priority") TicketPriority priority,
+                                        @Param("keyword") String keyword,
+                                        Pageable pageable);
+
+    @Query("SELECT t FROM Ticket t WHERE " +
+           "t.createdBy.id = :userId AND " +
+           "(:status IS NULL OR t.status = :status) AND " +
+           "(:priority IS NULL OR t.priority = :priority) AND " +
+           "(:keyword IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "OR LOWER(t.description) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<Ticket> searchTicketsByUserPaginated(@Param("userId") Long userId,
+                                              @Param("status") TicketStatus status,
+                                              @Param("priority") TicketPriority priority,
+                                              @Param("keyword") String keyword,
+                                              Pageable pageable);
+
     long countByStatus(TicketStatus status);
     long countByPriority(TicketPriority priority);
 

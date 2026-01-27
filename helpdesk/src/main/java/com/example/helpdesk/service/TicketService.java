@@ -137,6 +137,18 @@ public class TicketService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public Page<TicketDto> searchTicketsPaginated(TicketStatus status, TicketPriority priority, String keyword, Pageable pageable) {
+        Page<Ticket> ticketPage = ticketRepository.searchTicketsPaginated(status, priority, keyword, pageable);
+        return ticketPage.map(ticketMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<TicketDto> searchTicketsByUserPaginated(Long userId, TicketStatus status, TicketPriority priority, String keyword, Pageable pageable) {
+        Page<Ticket> ticketPage = ticketRepository.searchTicketsByUserPaginated(userId, status, priority, keyword, pageable);
+        return ticketPage.map(ticketMapper::toDto);
+    }
+
     @Transactional
     public TicketDto assignTicket(Long ticketId, Long userId) {
         Ticket ticket = getTicketEntityById(ticketId);
