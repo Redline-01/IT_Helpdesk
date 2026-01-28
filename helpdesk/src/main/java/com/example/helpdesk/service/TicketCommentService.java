@@ -60,10 +60,10 @@ public class TicketCommentService {
         commentRepository.delete(comment);
     }
 
-    @Transactional(readOnly = true)
-    public long getCommentCountByTicketId(Long ticketId) {
-        return commentRepository.countByTicket_Id(ticketId);
-    }
+//    @Transactional(readOnly = true)
+//    public long getCommentCountByTicketId(Long ticketId) {
+//        return commentRepository.countByTicket_Id(ticketId);
+//    }
 
     private TicketCommentDto toDto(TicketComment comment) {
         return TicketCommentDto.builder()

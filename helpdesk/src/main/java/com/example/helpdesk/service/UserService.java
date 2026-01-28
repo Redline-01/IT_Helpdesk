@@ -34,12 +34,12 @@ public class UserService {
         return userMapper.toDtoList(userRepository.findAll());
     }
 
-    @Transactional(readOnly = true)
-    public UserDto getUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        return userMapper.toDto(user);
-    }
+//    @Transactional(readOnly = true)
+//    public UserDto getUserById(Long id) {
+//        User user = userRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+//        return userMapper.toDto(user);
+//    }
 
     @Transactional(readOnly = true)
     public User getUserEntityById(Long id) {
@@ -85,42 +85,7 @@ public class UserService {
         return userMapper.toDto(savedUser);
     }
 
-    @Transactional
-    public UserDto updateUser(Long id, UserDto userDto) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
-        userMapper.updateEntity(userDto, user);
 
-        if (userDto.getDepartmentId() != null) {
-            Department department = departmentRepository.findById(userDto.getDepartmentId())
-                    .orElse(null);
-            user.setDepartment(department);
-        }
 
-        User updatedUser = userRepository.save(user);
-        return userMapper.toDto(updatedUser);
-    }
-
-    @Transactional
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
-    }
-
-    @Transactional
-    public void updateLastLogin(String username) {
-        User user = getUserByUsername(username);
-        user.setLastLogin(LocalDateTime.now());
-        userRepository.save(user);
-    }
-
-    @Transactional(readOnly = true)
-    public List<User> getUsersByRole(String roleName) {
-        return userRepository.findByRoles_Name(roleName);
-    }
-
-    @Transactional(readOnly = true)
-    public List<User> getActiveUsers() {
-        return userRepository.findByStatus(UserStatus.ACTIVE);
-    }
 }

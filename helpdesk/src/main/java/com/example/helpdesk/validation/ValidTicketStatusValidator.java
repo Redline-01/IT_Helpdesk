@@ -13,8 +13,7 @@ public class ValidTicketStatusValidator implements ConstraintValidator<ValidTick
         if (status == null) {
             return false;
         }
-        // Add custom validation logic here
-        // For example, prevent setting status to CLOSED without going through RESOLVED
+
         return true;
     }
 }
