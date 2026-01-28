@@ -314,12 +314,12 @@ h1, h2, h3, h4, h5, h6 {
 
 .offcanvas-body .nav-link:hover,
 .offcanvas-body .nav-link:focus {
-    background-color: #f8f9fa;
     color: #667eea !important;
 }
 
 .offcanvas-body .nav-link:active {
-    background-color: #e9ecef;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
 }
 
 .offcanvas-body .nav-link i {
