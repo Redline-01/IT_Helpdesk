@@ -1,4 +1,3 @@
-// Main JavaScript file for IT Helpdesk
 
 // Auto-hide alerts after 5 seconds
 document.addEventListener('DOMContentLoaded', function() {

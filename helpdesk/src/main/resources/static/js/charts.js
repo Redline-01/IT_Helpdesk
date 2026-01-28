@@ -1,4 +1,3 @@
-// Charts JavaScript for IT Helpdesk Dashboard
 
 // Common chart options
 const commonOptions = {
