@@ -1,5 +1,4 @@
 
-// Common chart options
 const commonOptions = {
     responsive: true,
     maintainAspectRatio: true,
@@ -29,7 +28,6 @@ const commonOptions = {
     }
 };
 
-// Color schemes
 const colorSchemes = {
     status: {
         open: '#ffc107',
@@ -53,7 +51,6 @@ const colorSchemes = {
     ]
 };
 
-// Create Doughnut Chart
 function createDoughnutChart(canvasId, labels, data, colors) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return null;
@@ -123,6 +120,7 @@ function renderDashboardCharts() {
     fetch('/api/stats')
         .then(response => response.json())
         .then(stats => {
+
             // Status Distribution Chart
             if (document.getElementById('statusChart') || document.getElementById('adminStatusChart')) {
                 const statusLabels = ['Open', 'In Progress', 'Resolved', 'Closed'];
@@ -159,11 +157,13 @@ function renderDashboardCharts() {
 }
 
 // Initialize charts when DOM is loaded
+
 document.addEventListener('DOMContentLoaded', function() {
     renderDashboardCharts();
 });
 
 // Refresh charts periodically (every 5 minutes)
+
 setInterval(function() {
     renderDashboardCharts();
 }, 300000);
