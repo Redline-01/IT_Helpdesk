@@ -79,7 +79,7 @@ public class TicketRestController {
         List<TicketDto> tickets = ticketService.searchTickets(status, priority, keyword);
 
         if (isUser) {
-            // Filter to show only user's own tickets
+            // Filter to show only users own tickets
             tickets = tickets.stream()
                     .filter(t -> t.getCreatedByUsername() != null &&
                                t.getCreatedByUsername().equals(username))
